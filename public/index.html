@@ -11,7 +11,13 @@
 	<script type="text/javascript" src="js/app.js"></script>
 	<script type="text/javascript">
 		//Sample functions, remove these functions and design ping-pong game with onInit and onUpdate.
-	
+
+		
+
+		const context=canvas.getContext('2d');
+		var UP = 38, DOWN = 40;
+	    var check=0;
+
 		function collision(b,p){
 			p.top = p.y;
 			p.bottom = p.y + p.height;
@@ -26,43 +32,45 @@
 			return p.left < b.right && p.top < b.bottom && p.right > b.left && p.bottom > b.top;
 		}
 
+		function drawText(text,x,y){
+				context.fillStyle = "#FFF";
+				context.font = "15px fantasy";
+				context.fillText(text, x, y);
+			}
 
+		
 		app.onInit = function () {
 			this.nodes.push({
 				id: 'ball',
-				
 				x  : canvas.width/2,
 				y  : canvas.height/2,
 				width  : 10,
 				height : 10,
-				radius: 100,
-				velocityX : 5,
-				velocityY : 5,
+				radius: 10,
+				velocityX : 2,
+				velocityY : 2,
 				speed : 2,
 				color  : 'WHITE',
 				
 			});
-
-			
-
-			console.log(this.getNode('ball'))
 
 			this.nodes.push({
 				id: 'user1',
 				x : 0, 
 				y : (canvas.height - 100)/2,
 				width : 10,
-				height : canvas.height/2,
+				height : canvas.height/4,
 				score : 0,
 				color : "RED"
 			});
+
 
 			this.nodes.push({
 				id: 'user2',
 				x : canvas.width - 10,
 				y : (canvas.height - 100)/2, 
 				width : 10,
-				height : canvas.height/2,
+				height : canvas.height/4,
 				score : 0,
 				color : "RED",
 				 
@@ -78,23 +86,126 @@
 				width : 2,
 				color : "WHITE"
 			});
-           
 
+			document.addEventListener("keydown", (evt)=>{
+				
+				
+				switch (evt.keyCode){
+					case 87:
+						this.getNode('user1').y-=5;
+					
+						break;
+					case 83:
+						this.getNode('user1').y+=5;
+						break;
+					case 38:
+						this.getNode('user2').y-=5;
+						break;
 
-			
+					case 40:
+						this.getNode('user2').y+=5;
+						
+						break;
 
+					case 32:
+					    console.log(check)
+						if(check==0){
+							this.getNode('ball').x = canvas.width/2;
+							this.getNode('ball').y = canvas.height/2;
+							this.getNode('ball').velocityX = 0;
+							this.getNode('ball').velocityY   = 0;
+							this.getNode('ball').speed = 0;
+							check=1;
+						}
+						    
+						if(check==1){
+							this.getNode('ball').x = canvas.width/2;
+							this.getNode('ball').y = canvas.height/2;
+							this.getNode('ball').velocityX = -  this.getNode('ball').velocityX;
+							this.getNode('ball').velocityY   = -  this.getNode('ball').velocityY;
+							this.getNode('ball').speed = 2;
+							check=0;
+						}
+						
+						
+						break;
+					default:
+					  console.log('press a valid key');
+					  break;
+				}
+				// let rect = canvas.getBoundingClientRect();
+                 
+
+				// switch(evt.key){
+				// 	case 38: 
+				// 	console.log('up arrow')
+				// 	break;
+				// }
+				//  this.getNode('user1').y = evt.clientY - rect.top - this.getNode('user1').height/2;
+			},false);
 
 		};
-
-
-
+		/* For keyboard event */
+		
+		
+    
 		app.onUpdate = function (time) {
 
 			
+		     //user controls
+			 drawText('W/Q', 0.3*canvas.width/4, canvas.height/5, "WHITE");
+			 drawText('↑/ ↓', 3.5*canvas.width/4, canvas.height/5, "WHITE");
+			//rendering score on the screen
+			drawText(this.getNode('user1').score, canvas.width/4, canvas.height/5, "WHITE");
+			drawText(this.getNode('user2').score, 3*canvas.width/4, canvas.height/5, "WHITE");
+
+
+			 //score updation
+			 if(this.getNode('ball').x- this.getNode('ball').radius <0){
+			   this.getNode('user2').score++;
+			   this.getNode('ball').x = canvas.width/2;
+			   this.getNode('ball').y = canvas.height/2;
+			   this.getNode('ball').velocityX = -  this.getNode('ball').velocityX;
+			   this.getNode('ball').speed = 2;
+			  
+		   }else if(this.getNode('ball').x +this.getNode('ball').radius > canvas.width){
+			   this.getNode('user1').score++;
+			   this.getNode('ball').x = canvas.width/2;
+			   this.getNode('ball').y = canvas.height/2;
+			   this.getNode('ball').velocityX = -  this.getNode('ball').velocityX;
+			   this.getNode('ball').speed = 2;
+			  
+		   }
+
+           this.getNode('ball').x+= this.getNode('ball').velocityX;
+		   this.getNode('ball').y+= this.getNode('ball').velocityY;
+
+
+           //if the ball hits the wall
+		   if( this.getNode('ball').y+ this.getNode('ball').radius>canvas.height ||  this.getNode('ball').y- this.getNode('ball').radius < 0){
+			this.getNode('ball').velocityY=- this.getNode('ball').velocityY;
+		   }
+
+		   let player= (this.getNode('ball').x<canvas.width/2)? this.getNode('user1') : this.getNode('user2');
 			
-					
+
+		   //collision detection
+		   if(collision(this.getNode('ball'),player)){
+			let collidePoint = (this.getNode('ball').y - (player.y + player.height/2));
+			collidePoint = collidePoint / (player.height/2);
+			let angleRad = (Math.PI/4) * collidePoint;
+			let direction = (this.getNode('ball').x + this.getNode('ball').radius < canvas.width/2) ? 1 : -1;
+			this.getNode('ball').velocityX = direction * this.getNode('ball').speed * Math.cos(angleRad);
+			this.getNode('ball').velocityY = this.getNode('ball').speed * Math.sin(angleRad);
+
+			this.getNode('ball').speed += 0.1;
+		   }
+
+		  
 			
 		};
+		
+
 	</script>
 </body>
 
