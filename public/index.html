@@ -16,7 +16,7 @@
 
 		const context=canvas.getContext('2d');
 		var UP = 38, DOWN = 40;
-	    var check=0;
+	    let  check=0;
 
 		function collision(b,p){
 			p.top = p.y;
@@ -47,6 +47,7 @@
 				width  : 10,
 				height : 10,
 				radius: 10,
+			
 				velocityX : 2,
 				velocityY : 2,
 				speed : 2,
@@ -107,8 +108,16 @@
 						
 						break;
 
-					case 32:
-					    console.log(check)
+					default:
+					  console.log('press a valid key');
+					  break;
+				}
+			 
+			},false);
+
+			document.addEventListener("keydown", (evt)=>{
+				if(evt.keyCode==32){
+ 		               console.log(check);
 						if(check==0){
 							this.getNode('ball').x = canvas.width/2;
 							this.getNode('ball').y = canvas.height/2;
@@ -116,42 +125,29 @@
 							this.getNode('ball').velocityY   = 0;
 							this.getNode('ball').speed = 0;
 							check=1;
+							return;
 						}
 						    
 						if(check==1){
 							this.getNode('ball').x = canvas.width/2;
 							this.getNode('ball').y = canvas.height/2;
-							this.getNode('ball').velocityX = -  this.getNode('ball').velocityX;
-							this.getNode('ball').velocityY   = -  this.getNode('ball').velocityY;
+							this.getNode('ball').velocityX = 2;
+							this.getNode('ball').velocityY   = 2 ;
 							this.getNode('ball').speed = 2;
-							check=0;
+							check=0 ;
+							return;
 						}
-						
-						
-						break;
-					default:
-					  console.log('press a valid key');
-					  break;
 				}
-				// let rect = canvas.getBoundingClientRect();
-                 
-
-				// switch(evt.key){
-				// 	case 38: 
-				// 	console.log('up arrow')
-				// 	break;
-				// }
-				//  this.getNode('user1').y = evt.clientY - rect.top - this.getNode('user1').height/2;
-			},false);
+			},false)
+    
 
 		};
 		/* For keyboard event */
 		
 		
-    
 		app.onUpdate = function (time) {
 
-			
+	
 		     //user controls
 			 drawText('W/Q', 0.3*canvas.width/4, canvas.height/5, "WHITE");
 			 drawText('↑/ ↓', 3.5*canvas.width/4, canvas.height/5, "WHITE");
