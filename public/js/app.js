@@ -19,7 +19,7 @@ var app = {
 		this.canvas  = document.getElementById('canvas');
 		this.context = this.canvas.getContext('2d');
 		
-
+      
 		this.render();
 		this.onInit();
 	},
@@ -57,6 +57,31 @@ var app = {
 		}
 
 		return { x : null, y : null, width : null, height : null };
+	},
+
+	resize: function(x,y) {
+		this.context.width=x ;
+		this.context.height=y ;
+	},
+
+	collision: function(b,p){
+		p.top = p.y;
+		p.bottom = p.y + p.height;
+		p.left = p.x;
+		p.right = p.x + p.width;
+		
+		b.top = b.y - b.radius;
+		b.bottom = b.y + b.radius;
+		b.left = b.x - b.radius;
+		b.right = b.x + b.radius;
+		
+		return p.left < b.right && p.top < b.bottom && p.right > b.left && p.bottom > b.top;
+	},
+
+	drawText: function(text,x,y){
+		context.fillStyle = "#FFF";
+		context.font = "15px fantasy";
+		context.fillText(text, x, y);
 	},
 
 	//events
