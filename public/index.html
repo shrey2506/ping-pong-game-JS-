@@ -15,31 +15,13 @@
 		
 
 		const context=canvas.getContext('2d');
-		var UP = 38, DOWN = 40;
+		
 	    let  check=0;
 
-		function collision(b,p){
-			p.top = p.y;
-			p.bottom = p.y + p.height;
-			p.left = p.x;
-			p.right = p.x + p.width;
-			
-			b.top = b.y - b.radius;
-			b.bottom = b.y + b.radius;
-			b.left = b.x - b.radius;
-			b.right = b.x + b.radius;
-			
-			return p.left < b.right && p.top < b.bottom && p.right > b.left && p.bottom > b.top;
-		}
-
-		function drawText(text,x,y){
-				context.fillStyle = "#FFF";
-				context.font = "15px fantasy";
-				context.fillText(text, x, y);
-			}
-
+		
 		
 		app.onInit = function () {
+		
 			this.nodes.push({
 				id: 'ball',
 				x  : canvas.width/2,
@@ -47,7 +29,7 @@
 				width  : 10,
 				height : 10,
 				radius: 10,
-			
+				bordeRadius: 5,
 				velocityX : 2,
 				velocityY : 2,
 				speed : 2,
@@ -88,9 +70,9 @@
 				color : "WHITE"
 			});
 
+
+			/* For keyboard event */
 			document.addEventListener("keydown", (evt)=>{
-				
-				
 				switch (evt.keyCode){
 					case 87:
 						this.getNode('user1').y-=5;
@@ -117,7 +99,7 @@
 
 			document.addEventListener("keydown", (evt)=>{
 				if(evt.keyCode==32){
- 		               console.log(check);
+ 		               
 						if(check==0){
 							this.getNode('ball').x = canvas.width/2;
 							this.getNode('ball').y = canvas.height/2;
@@ -142,18 +124,17 @@
     
 
 		};
-		/* For keyboard event */
 		
 		
+
 		app.onUpdate = function (time) {
 
-	
-		     //user controls
-			 drawText('W/Q', 0.3*canvas.width/4, canvas.height/5, "WHITE");
-			 drawText('↑/ ↓', 3.5*canvas.width/4, canvas.height/5, "WHITE");
-			//rendering score on the screen
-			drawText(this.getNode('user1').score, canvas.width/4, canvas.height/5, "WHITE");
-			drawText(this.getNode('user2').score, 3*canvas.width/4, canvas.height/5, "WHITE");
+		    //rendering score and controls on the screen
+			this.drawText('W/Q', 0.3*canvas.width/4, canvas.height/5, "WHITE");
+			this.drawText('↑/ ↓', 3.5*canvas.width/4, canvas.height/5, "WHITE");
+			
+			this.drawText(this.getNode('user1').score, canvas.width/4, canvas.height/5, "WHITE");
+			this.drawText(this.getNode('user2').score, 3*canvas.width/4, canvas.height/5, "WHITE");
 
 
 			 //score updation
@@ -186,7 +167,7 @@
 			
 
 		   //collision detection
-		   if(collision(this.getNode('ball'),player)){
+		   if(this.collision(this.getNode('ball'),player)){
 			let collidePoint = (this.getNode('ball').y - (player.y + player.height/2));
 			collidePoint = collidePoint / (player.height/2);
 			let angleRad = (Math.PI/4) * collidePoint;
